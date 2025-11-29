@@ -97,6 +97,12 @@ const joinRoom = async (req, res) => {
       .populate('hostId', 'name')
       .populate('players.playerId', 'name isOnline');
 
+    // Emit socket event to notify all players in the room
+    const io = req.app.get('io');
+    if (io) {
+      io.to(code).emit('room-updated', updatedRoom);
+    }
+
     res.json(updatedRoom);
   } catch (error) {
     res.status(500).json({ message: error.message });
