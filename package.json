@@ -1,0 +1,31 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js"
+  },
+  "keywords": [],
+  "author": "Prerit",
+  "license": "MIT",
+  "description": "Prediction game",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kotak-Prerit/behaviourcall-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Kotak-Prerit/behaviourcall-server/issues"
+  },
+  "homepage": "https://github.com/Kotak-Prerit/behaviourcall-server#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^9.0.0",
+    "nodemon": "^3.1.11",
+    "socket.io": "^4.8.1"
+  }
+}
