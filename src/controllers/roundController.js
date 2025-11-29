@@ -27,19 +27,16 @@ const createRound = async (req, res) => {
     const lastRound = await Round.findOne({ roomId }).sort({ roundNumber: -1 });
     const roundNumber = lastRound ? lastRound.roundNumber + 1 : 1;
 
-    // Create assignments (each player gets a random target, not themselves)
+    // Create assignments (each player gets a unique target, not themselves)
     const playerIds = room.players.map(p => p.playerId);
-    const shuffledTargets = shuffleArray(playerIds);
-
+    
+    // For even number of players, ensure everyone gets a unique target
+    // Use a derangement algorithm - shift everyone by 1
     const assignments = playerIds.map((playerId, index) => {
-      let targetIndex = index;
-      // Ensure player doesn't get themselves
-      if (shuffledTargets[targetIndex].toString() === playerId.toString()) {
-        targetIndex = (index + 1) % playerIds.length;
-      }
+      const targetIndex = (index + 1) % playerIds.length;
       return {
         playerId,
-        targetId: shuffledTargets[targetIndex]
+        targetId: playerIds[targetIndex]
       };
     });
 
@@ -67,6 +64,7 @@ const createRound = async (req, res) => {
 const getRoundById = async (req, res) => {
   try {
     const round = await Round.findById(req.params.id)
+      .populate('roomId', 'code')
       .populate('assignments.playerId', 'name')
       .populate('assignments.targetId', 'name');
 

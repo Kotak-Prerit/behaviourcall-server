@@ -64,11 +64,17 @@ const getPlayerById = async (req, res) => {
 // @access  Public
 const updatePlayer = async (req, res) => {
   try {
-    const { socketId, isOnline, currentRoomId } = req.body;
+    const { socketId, isOnline, currentRoomId, avatar } = req.body;
+    
+    const updateData = {};
+    if (socketId !== undefined) updateData.socketId = socketId;
+    if (isOnline !== undefined) updateData.isOnline = isOnline;
+    if (currentRoomId !== undefined) updateData.currentRoomId = currentRoomId;
+    if (avatar !== undefined) updateData.avatar = avatar;
     
     const player = await Player.findByIdAndUpdate(
       req.params.id,
-      { socketId, isOnline, currentRoomId },
+      updateData,
       { new: true, runValidators: true }
     );
 

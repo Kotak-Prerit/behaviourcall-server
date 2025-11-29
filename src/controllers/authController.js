@@ -12,11 +12,26 @@ const loginPlayer = async (req, res) => {
       return res.status(400).json({ message: 'Name is required' });
     }
 
+    // Check if name already exists and is online (duplicate prevention)
+    const existingOnlinePlayer = await Player.findOne({ 
+      name: name.trim(), 
+      isOnline: true 
+    });
+    
+    if (existingOnlinePlayer) {
+      return res.status(400).json({ 
+        message: 'This username is already taken. Please choose a different name.' 
+      });
+    }
+
     // Find or create player
     let player = await Player.findOne({ name: name.trim() });
     
     if (!player) {
-      player = await Player.create({ name: name.trim() });
+      player = await Player.create({ name: name.trim(), isOnline: true });
+    } else {
+      player.isOnline = true;
+      await player.save();
     }
 
     // Generate JWT token

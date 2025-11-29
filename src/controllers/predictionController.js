@@ -68,17 +68,61 @@ const getPredictionByPlayer = async (req, res) => {
 // @access  Public
 const markPredictionHappened = async (req, res) => {
   try {
-    const prediction = await Prediction.findById(req.params.id);
+    const prediction = await Prediction.findById(req.params.id)
+      .populate('roundId')
+      .populate('predictorId', 'name score');
 
     if (!prediction) {
       return res.status(404).json({ message: 'Prediction not found' });
     }
 
+    const Round = require('../models/Round');
+    const Player = require('../models/Player');
+    
+    const round = await Round.findById(prediction.roundId);
+    
+    // Check if someone already won this round
+    if (round.winnerId) {
+      return res.status(400).json({ 
+        message: 'Game already won by another player',
+        isWinner: false,
+        winnerId: round.winnerId
+      });
+    }
+
+    // Mark this player as winner
+    round.winnerId = prediction.predictorId._id;
+    round.completedAt = new Date();
+    round.phase = 'completed';
+    await round.save();
+
+    // Award points to the player
+    const player = await Player.findById(prediction.predictorId._id);
+    player.score += 10;
+    await player.save();
+
+    // Mark prediction as happened
     prediction.happened = true;
-    prediction.points = 10; // Award points
+    prediction.points = 10;
     await prediction.save();
 
-    res.json(prediction);
+    // Emit socket event to notify all players
+    const Room = require('../models/Room');
+    const room = await Room.findById(round.roomId);
+    const io = req.app.get('io');
+    if (io && room) {
+      io.to(room.code).emit('round-won', { 
+        winnerId: player._id,
+        winnerName: player.name,
+        roundId: round._id
+      });
+    }
+
+    res.json({
+      ...prediction.toObject(),
+      isWinner: true,
+      totalScore: player.score
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

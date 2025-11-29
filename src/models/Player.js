@@ -19,6 +19,14 @@ const playerSchema = new mongoose.Schema({
     ref: 'Room',
     default: null
   },
+  score: {
+    type: Number,
+    default: 0
+  },
+  avatar: {
+    type: String,
+    default: 'avatar1.webp'
+  },
   createdAt: {
     type: Date,
     default: Date.now

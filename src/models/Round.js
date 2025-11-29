@@ -34,6 +34,15 @@ const roundSchema = new mongoose.Schema({
     type: Number,
     default: 300000 // 5 minutes in milliseconds
   },
+  winnerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Player',
+    default: null
+  },
+  completedAt: {
+    type: Date,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now
