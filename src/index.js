@@ -6,6 +6,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 
 // Import routes
+const authRoutes = require('./routes/authRoutes');
 const playerRoutes = require('./routes/playerRoutes');
 const roomRoutes = require('./routes/roomRoutes');
 const roundRoutes = require('./routes/roundRoutes');
@@ -25,10 +26,14 @@ const io = new Server(server, {
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'https://behaviourcall.vercel.app',
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/players', playerRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/rounds', roundRoutes);
