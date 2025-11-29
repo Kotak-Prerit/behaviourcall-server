@@ -19,7 +19,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: process.env.CLIENT_URL || 'https://behaviourcall.vercel.app',
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
 });
