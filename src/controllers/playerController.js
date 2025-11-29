@@ -30,6 +30,18 @@ const getOnlinePlayers = async (req, res) => {
   }
 };
 
+// @desc    Get all players
+// @route   GET /api/players
+// @access  Public
+const getAllPlayers = async (req, res) => {
+  try {
+    const players = await Player.find().select('-__v').sort({ createdAt: -1 });
+    res.json(players);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Get player by ID
 // @route   GET /api/players/:id
 // @access  Public
@@ -89,6 +101,7 @@ const deletePlayer = async (req, res) => {
 
 module.exports = {
   createPlayer,
+  getAllPlayers,
   getOnlinePlayers,
   getPlayerById,
   updatePlayer,
