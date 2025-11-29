@@ -134,6 +134,18 @@ const updateReadyStatus = async (req, res) => {
       .populate('hostId', 'name')
       .populate('players.playerId', 'name isOnline');
 
+    // Emit socket event to notify all players in the room
+    const io = req.app.get('io');
+    if (io) {
+      io.to(code).emit('room-updated', updatedRoom);
+      
+      // Check if all players are ready
+      const allReady = updatedRoom.players.every(p => p.isReady);
+      if (allReady && updatedRoom.players.length >= 2) {
+        io.to(code).emit('all-players-ready');
+      }
+    }
+
     res.json(updatedRoom);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -173,6 +185,12 @@ const leaveRoom = async (req, res) => {
     const updatedRoom = await Room.findById(room._id)
       .populate('hostId', 'name')
       .populate('players.playerId', 'name isOnline');
+
+    // Emit socket event to notify all players in the room
+    const io = req.app.get('io');
+    if (io) {
+      io.to(code).emit('room-updated', updatedRoom);
+    }
 
     res.json(updatedRoom);
   } catch (error) {
